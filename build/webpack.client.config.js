@@ -16,23 +16,23 @@ const config = Object.assign({}, base, {
   ])
 })
 
+
 if (process.env.NODE_ENV === 'production') {
-  // Use ExtractTextPlugin to extract CSS into a single file
-  // so it's applied on initial render
   const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
-  // vueConfig is already included in the config via LoaderOptionsPlugin
-  // here we overwrite the loader config for <style lang="stylus">
-  // so they are extracted.
-  vueConfig.loaders = {
-    stylus: ExtractTextPlugin.extract({
-      loader: "css-loader!stylus-loader",
-      fallbackLoader: "vue-style-loader" // <- this is a dep of vue-loader
-    })
-  }
+  let extractCSS = new ExtractTextPlugin('styles.css');
+
+  config.module.rules.push({
+    test: /\.scss$/,
+    loader: extractCSS.extract({
+      loader: [ "css?-url&-import&sourceMap", "sass?precision=10&sourceMap" ],
+      fallbackLoader: "style"
+    }),
+    exclude: /node_modules/
+  })
 
   config.plugins.push(
-    new ExtractTextPlugin('styles.css'),
+    extractCSS,
     // this is needed in webpack 2 for minifying CSS
     new webpack.LoaderOptionsPlugin({
       minimize: true
@@ -44,6 +44,12 @@ if (process.env.NODE_ENV === 'production') {
       }
     })
   )
+} else {
+  config.module.rules.push({
+    test: /\.scss$/,
+    loaders: [ "style", "css?-url&-import&sourceMap", "sass?precision=10&sourceMap" ],
+    exclude: /node_modules/
+  })
 }
 
 module.exports = config

@@ -1,0 +1,21 @@
+doctype html
+html(lang='en')
+    head
+        meta(charset='utf-8')
+
+        title= state.title
+
+        meta(name='viewport', content='initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui')
+
+        link(href='https://fonts.googleapis.com/css?family=Roboto:300,400,700', rel='stylesheet', type='text/css')
+
+        each style in styles
+            link(href=style, rel='stylesheet', type='text/css')
+
+        if initialState
+            script window.__INITIAL_STATE__ = !{initialState}
+    body
+        #app!= chunk
+
+        each script in scripts
+            script(src=script)

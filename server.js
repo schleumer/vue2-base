@@ -8,26 +8,18 @@ const express = require('express')
 const favicon = require('serve-favicon')
 const serialize = require('serialize-javascript')
 const compression = require('compression')
+const pug = require('pug')
+
+const template = pug.compile(fs.readFileSync(resolve('./index.pug')), {});
 
 // https://github.com/vuejs/vue/blob/next/packages/vue-server-renderer/README.md#why-use-bundlerenderer
 const createBundleRenderer = require('vue-server-renderer').createBundleRenderer
 
 const app = express()
 
-// parse index.html template
-const html = (() => {
-  const template = fs.readFileSync(resolve('./index.html'), 'utf-8')
-  const i = template.indexOf('{{ APP }}')
-  // styles are injected dynamically via vue-style-loader in development
-  const style = isProd ? '<link rel="stylesheet" href="/dist/styles.css">' : ''
-  return {
-    head: template.slice(0, i).replace('{{ STYLE }}', style),
-    tail: template.slice(i + '{{ APP }}'.length)
-  }
-})()
-
 // setup the server renderer, depending on dev/prod environment
 let renderer
+
 if (isProd) {
   // create server renderer from real fs
   const bundlePath = resolve('./dist/server-bundle.js')
@@ -52,8 +44,27 @@ app.use('/dist', express.static(resolve('./dist')))
 app.use(favicon(resolve('./src/assets/logo.png')))
 
 app.get('*', (req, res) => {
+  const styles = []
+
+  const scripts = [
+    '/dist/client-vendor-bundle.js',
+    '/dist/app-bundle.js'
+  ]
+
+  if (isProd)
+    styles.push('/dist/styles.css')
+  else
+    scripts.push('/dist/style-bundle.js')
+
   if (req.query[ 'no-state' ]) {
-    return res.end(html.head + `<div id="app"></div>` + html.tail);
+    return res.end(template({
+      styles,
+      scripts,
+      state: {
+        title: 'App'
+      },
+      chunk: null
+    }));
   }
 
   if (!renderer) {
@@ -66,35 +77,27 @@ app.get('*', (req, res) => {
   let firstChunk = true
 
   renderStream.on('data', chunk => {
-    if (firstChunk) {
-      res.write(html.head)
-      // embed initial store state
-      if (context.initialState) {
-        context.initialState.fetched = true;
-        res.write(
-          `<script>window.__INITIAL_STATE__=${
-            serialize(context.initialState, { isJSON: true })
-            }</script>`
-        )
-      }
-      firstChunk = false
-    }
-    res.write(chunk)
+    res.end(template({
+      chunk,
+      styles,
+      scripts,
+      state: context.initialState,
+      initialState: serialize(context.initialState, { isJSON: true })
+    }))
   })
 
   renderStream.on('end', () => {
-    res.end(html.tail)
     console.log(`whole request: ${Date.now() - s}ms`)
   })
 
   renderStream.on('error', err => {
     // Render Error Page or Redirect
     res.status(500).end('Internal Error 500')
-    console.error(`error during render : ${req.url}`)
+    console.error(`error during render : ${req.url}`, { err })
   })
 })
 
-const port = process.env.PORT || 8081
+const port = process.env.PORT || 7070
 app.listen(port, () => {
   console.log(`server started at localhost:${port}`)
 })

@@ -7,7 +7,7 @@ module.exports = {
   entry: {
     app: './src/client-entry.js',
     style: './src/styles/app.scss',
-    vendor: ['vue', 'vue-router', 'vuex', 'firebase', 'lru-cache', 'es6-promise']
+    vendor: [ 'vue', 'vue-router', 'vuex', 'es6-promise' ]
   },
   output: {
     path: path.resolve(__dirname, '../dist'),
@@ -24,11 +24,6 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.scss$/,
-        loaders: ["style", "css?-url&-import", "sass"],
         exclude: /node_modules/
       },
       {

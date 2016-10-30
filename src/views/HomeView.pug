@@ -1,2 +1,6 @@
 div
     test xd
+    div
+        form(@submit.prevent="update()")
+            input(type="text", v-model="nextValue")
+            button(type="submit") Set
