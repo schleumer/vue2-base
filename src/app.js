@@ -6,7 +6,6 @@ import { sync } from 'vuex-router-sync'
 import * as filters from './filters'
 import SetTitle from './tools/set-title'
 
-
 Vue.use(SetTitle)
 
 // sync the router with the vuex store.

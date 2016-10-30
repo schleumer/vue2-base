@@ -1,7 +1,7 @@
 <template src="./HomeView.pug" lang="pug"/>
 
 <script type="text/javascript">
-    import Test from '../components/Test.vue';
+    import Test from '../components/Test.vue'
 
     export default {
         data() {
