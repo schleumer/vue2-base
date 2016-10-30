@@ -1,0 +1,1 @@
+<template src="./Test.pug" lang="pug" />

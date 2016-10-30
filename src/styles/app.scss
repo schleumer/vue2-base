@@ -1,0 +1,31 @@
+
+
+.space-1 {
+  > *:not(:last-child) {
+    margin-right: 1px;
+  }
+}
+
+.space-2 {
+  > *:not(:last-child) {
+    margin-right: 2px;
+  }
+}
+
+.space-3 {
+  > *:not(:last-child) {
+    margin-right: 3px;
+  }
+}
+
+.space-4 {
+  > *:not(:last-child) {
+    margin-right: 4px;
+  }
+}
+
+.space-5 {
+  > *:not(:last-child) {
+    margin-right: 5px;
+  }
+}
